@@ -80,6 +80,7 @@ public class Gui extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 enableAllOnPanel(buttonPanel);
                 addNodeButton.setEnabled(false);
+                graph.setGraphState("node");
             }
         });
     }
@@ -94,6 +95,7 @@ public class Gui extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 enableAllOnPanel(buttonPanel);
                 addEdgeButton.setEnabled(false);
+                graph.setGraphState("edge");
             }
         });
     }
