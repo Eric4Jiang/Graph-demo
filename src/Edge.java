@@ -10,6 +10,9 @@ public class Edge {
         this.n1 = n1;
         this.n2 = n2;
         this.weight = lengthSquared();
+        color = Graph.defaultC;
+
+        System.out.println("Edge name = " + n1.name + " " + n2.name);
     }
 
     public double slope() {

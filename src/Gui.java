@@ -15,16 +15,17 @@ public class Gui extends JFrame {
 
         buttonPanel = new JPanel();
 
-        // initial buttons that show up
+        // add buttons to GUI
         createAddNodeButton();
         createAddEdgeButton();
         createSolveGraphButton();
         add(this.buttonPanel);
 
+        // add graph to GUI
         graph = new Graph();
         add(graph);
 
-        // init Jframe
+        // init Jframe for GUI
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
@@ -58,7 +59,7 @@ public class Gui extends JFrame {
     /**
      * Make all buttons clickable
      */
-    public void enableAllOnPanel(JPanel panel) {
+    public void enableComponentsOnPanel(JPanel panel) {
         Component[] components = panel.getComponents();
         for(Component c : components) {
             c.setEnabled(true);
@@ -78,9 +79,9 @@ public class Gui extends JFrame {
         addNodeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                enableAllOnPanel(buttonPanel);
+                enableComponentsOnPanel(buttonPanel);
                 addNodeButton.setEnabled(false);
-                graph.setGraphState("node");
+                graph.setGraphState(0);
             }
         });
     }
@@ -93,9 +94,9 @@ public class Gui extends JFrame {
         addEdgeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                enableAllOnPanel(buttonPanel);
+                enableComponentsOnPanel(buttonPanel);
                 addEdgeButton.setEnabled(false);
-                graph.setGraphState("edge");
+                graph.setGraphState(1);
             }
         });
     }

@@ -6,15 +6,19 @@ import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 public class Graph extends JPanel implements MouseListener {
+    public static Color defaultC = Color.BLACK, highlight = Color.GREEN;
 
     public ArrayList<Node> nodes;
-    final public int NODE_SIZE = 26;
 
     public ArrayList<Edge> edges;
+    public Node edge_node1;
+
+    public int graph_state = -1; // -1 -> Do nothing
+                                 // 0 -> Adding nodes
+                                 // 1 -> Forming edges. 0 nodes selected
+                                 // 2 -> Forming edges. 1 node selected;
 
     public int GRAPH_SIZE = 1000;
-
-    public String graph_state;
 
     public Graph() {
         nodes = new ArrayList<>();
@@ -28,11 +32,16 @@ public class Graph extends JPanel implements MouseListener {
         setPreferredSize(new Dimension(GRAPH_SIZE, GRAPH_SIZE)); // calls paintcomponent
     }
 
-    public void setGraphState(String state) {
+    public void setGraphState(int state) {
+        System.out.println("state = " + state);
+        if (state != 2 && edge_node1 != null) {
+            edge_node1.setColor(defaultC);
+            refreshGraph();
+        }
         this.graph_state = state;
     }
 
-    public String getGraphState() {
+    public int getGraphState() {
         return this.graph_state;
     }
 
@@ -43,16 +52,16 @@ public class Graph extends JPanel implements MouseListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
+//        Graphics2D g2d = (Graphics2D) g;
 
-        for (Node n : this.nodes) {
-            g.setColor(n.getColor());
-            // draw node and name it
-            int offset = NODE_SIZE / 2;
-            g.drawString(n.getName(), (int)n.getX() - offset, (int)n.getY() - offset);
-            g2d.fill(new Ellipse2D.Double(n.getX() - offset, n.getY() - offset, NODE_SIZE, NODE_SIZE));
+        // draw edges
+        ((Graphics2D) g).setStroke(new BasicStroke(10));
+        for(Edge e : edges) {
+            Node n1 = e.n1;
+            Node n2 = e.n2;
+            g.setColor(e.color);
+            g.drawLine((int)n1.vertex.getX(), (int)n1.vertex.getY(), (int)n2.vertex.getX(), (int)n2.vertex.getY());
         }
-
     }
 
     public void refreshGraph() {
@@ -60,12 +69,21 @@ public class Graph extends JPanel implements MouseListener {
         revalidate();
     }
 
+    /**
+     * Handles node creation.
+     * Omne "Add Node" has been selected, a click on anywhere on the graph
+     * will spawn a node there. Can't place nodes too close to each other.
+     *
+     * @param e - where mouse was clicked on graph
+     */
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (graph_state.equals("node")) {
+        System.out.println("graph-clicked");
+        if (graph_state == 0) {
             // create a node where mouse was clicked
             Node n = new Node(e.getX(), e.getY(), this);
             this.nodes.add(n);
+            add(n);
             refreshGraph();
         }
     }
