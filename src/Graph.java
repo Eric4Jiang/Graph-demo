@@ -2,15 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Graph extends JPanel implements MouseListener {
     public static Color defaultC = Color.BLACK, highlight = Color.GREEN;
 
-    public ArrayList<Node> nodes;
+    public ArrayList<Node> nodes = new ArrayList<>();
+    public Map nameToNode = new HashMap<String, Node>();
 
-    public ArrayList<Edge> edges;
+    public ArrayList<Edge> edges = new ArrayList<>();
+    public Map<String, Edge> nameToEdge = new HashMap<>();
     public Node edge_node1;
 
     public int graph_state = -1; // -1 -> Do nothing
@@ -21,9 +24,6 @@ public class Graph extends JPanel implements MouseListener {
     public int GRAPH_SIZE = 1000;
 
     public Graph() {
-        nodes = new ArrayList<>();
-        edges = new ArrayList<>();
-
         this.addMouseListener(this);
 
         // init graph
@@ -47,6 +47,7 @@ public class Graph extends JPanel implements MouseListener {
 
     /**
      * Called every time a change is made to update graph
+     *
      * @param g - graphics object
      */
     @Override
@@ -69,6 +70,18 @@ public class Graph extends JPanel implements MouseListener {
         revalidate();
     }
 
+    public void addNode(Node n) {
+        nameToNode.put(n.getName(), n);
+        this.nodes.add(n);
+        add(n);
+        refreshGraph();
+    }
+
+    public void addEdge(Edge e) {
+        nameToEdge.put(e.name, e);
+        this.edges.add(e);
+    }
+
     /**
      * Handles node creation.
      * Omne "Add Node" has been selected, a click on anywhere on the graph
@@ -82,9 +95,7 @@ public class Graph extends JPanel implements MouseListener {
         if (graph_state == 0) {
             // create a node where mouse was clicked
             Node n = new Node(e.getX(), e.getY(), this);
-            this.nodes.add(n);
-            add(n);
-            refreshGraph();
+            addNode(n);
         }
     }
 
@@ -106,5 +117,66 @@ public class Graph extends JPanel implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    // ============================ Solving Graph =================================
+
+    /**
+     * @param n1 - name of first node
+     * @param n2 - name of second node
+     * @return - Instance of edge that connects the first and second node.
+     *           If no edge found, return null.
+     */
+    public Edge findEdge(String n1, String n2) {
+        String name1 = n1 + n2;
+        String name2 = n2 + n1;
+
+        if (!nameToEdge.containsKey(name1)) {
+            return nameToEdge.get(name2);
+        }
+
+        return nameToEdge.get(name1);
+    }
+
+    /**
+     * finds all nodes connected to n by an edge
+     *
+     * @param n - node to find edges for
+     * @return - List of MyPairs. MyPairs will contain edges that are connected to
+     *           Node n.
+     */
+    public ArrayList<MyPair> adjacent(Node n) {
+        ArrayList<MyPair> adj = new ArrayList<>();
+        for(Edge e : edges) {
+            if(e.n1.name.equals(n.name)) {
+                adj.add(new MyPair(e.n2, e));
+            } else if(e.n2.name.equals(n.name)) {
+                adj.add(new MyPair(e.n1, e));
+            }
+        }
+        for(MyPair p : adj) {
+            System.out.println("Adjacent: " + p.edge.name);
+        }
+
+        return adj;
+    }
+
+    /**
+     * Finds the graph's MST(Minimum Spanning Tree)
+     *  or shortest tree that connects all nodes.
+     *
+     * @param method - which algorithm to find MST
+     * @return - List of edges that represent MST.
+     */
+    public ArrayList<Edge> findMST(String method) {
+        if (method.equals("kruskal")) {
+            Kruskal k = new Kruskal();
+            return k.solveMST(this);
+        } else if (method.equals("prim")) {
+            Prim p = new Prim();
+            return p.solveMST(this);
+        }
+
+        return null;
     }
 }

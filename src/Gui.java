@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class Gui extends JFrame {
 
@@ -112,6 +113,57 @@ public class Gui extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearButtonPanel();
+                createKruskalButton();
+                createPrimButton();
+            }
+        });
+    }
+
+    /**
+     * Find MST of graph using kruskal's algorithm
+     */
+    public void createKruskalButton() {
+        JButton kruskalButton = makeButton("Kruskal", BUTTON_H, BUTTON_W);
+        kruskalButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                clearButtonPanel();
+
+                for (Edge edge1 : graph.edges) {
+                    edge1.setColor(Graph.defaultC);
+                }
+
+                ArrayList<Edge> MST = graph.findMST("kruskal");
+                for (Edge edge : MST) {
+                    edge.setColor(Graph.highlight);
+                }
+
+                graph.refreshGraph();
+                System.out.println("Kruskal MST = " + MST);
+            }
+        });
+    }
+
+    /**
+     * Finds MST of graph using prim's algorithm
+     */
+    public void createPrimButton() {
+        JButton primButton = makeButton("Prim", BUTTON_H, BUTTON_W);
+        primButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                clearButtonPanel();
+
+                for (Edge edge1 : graph.edges) {
+                    edge1.setColor(Graph.defaultC);
+                }
+
+                ArrayList<Edge> MST = graph.findMST("prim");
+                for (Edge edge : MST) {
+                    edge.setColor(Graph.highlight);
+                }
+                graph.refreshGraph();
+                System.out.println("Prim MST = " + MST);
             }
         });
     }

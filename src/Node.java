@@ -76,7 +76,7 @@ public class Node extends JPanel implements MouseListener{
         } else if (parentGraph.getGraphState() == 2) {
             // make sure first and second node are different
             if (color != Graph.highlight) {
-                parentGraph.edges.add(new Edge(parentGraph.edge_node1, this));
+                parentGraph.addEdge(new Edge(parentGraph.edge_node1, this));
             }
             parentGraph.setGraphState(1); // restart edge forming process
         }
