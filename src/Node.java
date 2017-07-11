@@ -45,6 +45,11 @@ public class Node extends JPanel implements MouseListener{
         return this.color;
     }
 
+    public void refreshNode() {
+        repaint();
+        revalidate();
+    }
+
     /**
      * Redraws node when changes are made
      * @param g - graphics object
@@ -73,6 +78,7 @@ public class Node extends JPanel implements MouseListener{
             color = Graph.highlight;
             parentGraph.edge_node1 = this;
             parentGraph.setGraphState(2);
+            refreshNode();
         } else if (parentGraph.getGraphState() == 2) {
             // make sure first and second node are different
             if (color != Graph.highlight) {
@@ -80,7 +86,6 @@ public class Node extends JPanel implements MouseListener{
             }
             parentGraph.setGraphState(1); // restart edge forming process
         }
-        parentGraph.refreshGraph();
     }
 
     @Override

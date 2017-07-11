@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Graph extends JPanel implements MouseListener {
-    public static Color defaultC = Color.BLACK, highlight = Color.GREEN;
+    public static Color defaultC = Color.BLACK, highlight = Color.GREEN,
+                        MST_C = Color.RED ;
 
     public ArrayList<Node> nodes = new ArrayList<>();
     public Map nameToNode = new HashMap<String, Node>();
@@ -70,6 +71,16 @@ public class Graph extends JPanel implements MouseListener {
         revalidate();
     }
 
+    public void resetComponentColors() {
+        for (Node n : nodes) {
+            n.setColor(defaultC);
+        }
+        for (Edge e : edges) {
+            e.setColor(defaultC);
+        }
+        refreshGraph();
+    }
+
     public void addNode(Node n) {
         nameToNode.put(n.getName(), n);
         this.nodes.add(n);
@@ -80,6 +91,7 @@ public class Graph extends JPanel implements MouseListener {
     public void addEdge(Edge e) {
         nameToEdge.put(e.name, e);
         this.edges.add(e);
+        refreshGraph();
     }
 
     /**
@@ -91,7 +103,7 @@ public class Graph extends JPanel implements MouseListener {
      */
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("graph-clicked");
+//        System.out.println("graph-clicked");
         if (graph_state == 0) {
             // create a node where mouse was clicked
             Node n = new Node(e.getX(), e.getY(), this);
@@ -168,10 +180,13 @@ public class Graph extends JPanel implements MouseListener {
      * @param method - which algorithm to find MST
      * @return - List of edges that represent MST.
      */
-    public ArrayList<Edge> findMST(String method) {
+    public ArrayList<Edge> demoMST(String method) {
+        if (edges.isEmpty())
+            return null;
+
         if (method.equals("kruskal")) {
-            Kruskal k = new Kruskal();
-            return k.solveMST(this);
+            Kruskal k = new Kruskal(this);
+            k.execute();
         } else if (method.equals("prim")) {
             Prim p = new Prim();
             return p.solveMST(this);
