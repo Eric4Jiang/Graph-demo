@@ -34,11 +34,15 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
 
         Collections.sort(Edges);
 
-        for(Node n : Nodes) {
+        for (Node n : Nodes) {
             PARENT.put(n.name, n.name);
             RANK.put(n.name, 0);
         }
-        for(Edge e : Edges) {
+        for (Edge e : Edges) {
+            // gui paused
+            while(graph.isPaused()) {
+                Thread.sleep(1);
+            }
             // pauses gui to highlight edge on gui
             e.setColor(Graph.highlight);
             publish(e);
@@ -48,7 +52,7 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
             String root2 = Find(e.n2.name);
 
             // found tree with different root connected by Edge e.
-            if(root1 != root2) {
+            if (root1 != root2) {
                 MST.add(e);
                 Union(root1, root2);
 
@@ -61,6 +65,7 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
                 publish(e);
             }
             Thread.sleep(SLEEP_TIME);
+
         }
 
         return true;
@@ -79,14 +84,7 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
 
     @Override
     protected void done() {
-        try {
-            Boolean status = get();
-            System.out.println("Kruskal done: " + status);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+
     }
 
     // finds the root of a vertex by traversing through

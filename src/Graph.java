@@ -21,8 +21,13 @@ public class Graph extends JPanel implements MouseListener {
                                  // 0 -> Adding nodes
                                  // 1 -> Forming edges. 0 nodes selected
                                  // 2 -> Forming edges. 1 node selected;
+                                 // 3 -> Doing animation demonstration
 
     public int GRAPH_SIZE = 1000;
+
+    public SwingWorker kruskal;
+    public SwingWorker prim;
+    public boolean paused = false;
 
     public Graph() {
         this.addMouseListener(this);
@@ -36,14 +41,17 @@ public class Graph extends JPanel implements MouseListener {
     public void setGraphState(int state) {
         System.out.println("state = " + state);
         if (state != 2 && edge_node1 != null) {
-            edge_node1.setColor(defaultC);
-            refreshGraph();
+            resetComponentColors();
         }
         this.graph_state = state;
     }
 
     public int getGraphState() {
         return this.graph_state;
+    }
+
+    public boolean isPaused() {
+        return this.paused;
     }
 
     /**
@@ -180,18 +188,25 @@ public class Graph extends JPanel implements MouseListener {
      * @param method - which algorithm to find MST
      * @return - List of edges that represent MST.
      */
-    public ArrayList<Edge> demoMST(String method) {
+    public ArrayList<Edge> animateMST(String method) {
         if (edges.isEmpty())
             return null;
 
         if (method.equals("kruskal")) {
-            Kruskal k = new Kruskal(this);
-            k.execute();
+            kruskal = new Kruskal(this);
+            kruskal.execute();
         } else if (method.equals("prim")) {
             Prim p = new Prim();
             return p.solveMST(this);
         }
 
         return null;
+    }
+
+    public void pauseMSTAnimation(boolean value) {
+        this.paused = value;
+//        if (!kruskal.isCancelled()) {
+//            kruskal.cancel(true);
+//        }
     }
 }
