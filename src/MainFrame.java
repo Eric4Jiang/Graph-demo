@@ -159,8 +159,9 @@ public class MainFrame extends JFrame {
                 clearPanel(buttonPanel);
                 graph.resetComponentColors();
 
+                graph.pauseMSTAnimation(false);
+
                 ArrayList<Edge> MST = graph.animateMST("kruskal");
-                System.out.println("Kruskal MST = " + MST);
 
                 createPauseResumeAnimationButton();
                 createBackButton(1);
@@ -177,11 +178,8 @@ public class MainFrame extends JFrame {
         primButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                clearButtonPanel();
-
-//                for (Edge edge1 : graph.edges) {
-//                    edge1.setColor(Graph.defaultC);
-//                }
+                clearPanel(buttonPanel);
+                graph.resetComponentColors();
 
                 ArrayList<Edge> MST = graph.animateMST("prim");
                 for (Edge edge : MST) {
@@ -189,6 +187,9 @@ public class MainFrame extends JFrame {
                 }
                 graph.refreshGraph();
                 System.out.println("Prim MST = " + MST);
+
+                createPauseResumeAnimationButton();
+                createBackButton(1);
             }
         });
         addToPanelLayer(primButton, 1);
@@ -204,6 +205,9 @@ public class MainFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearPanel(buttonPanel);
+
+                graph.killAllAnimation();
+
                 for (JButton b : layer) {
                     buttonPanel.add(b);
                 }

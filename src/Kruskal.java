@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 public class Kruskal extends SwingWorker<Boolean, Edge>{
 
@@ -22,6 +21,8 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
     }
 
     /**
+     * Called when this class is executed
+     *
      * finds MST by continuously appending the lowest weight edges onto forests
      * until there is one distinct forest that contains all the vertices with no cycles
      *
@@ -39,10 +40,6 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
             RANK.put(n.name, 0);
         }
         for (Edge e : Edges) {
-            // gui paused
-            while(graph.isPaused()) {
-                Thread.sleep(1);
-            }
             // pauses gui to highlight edge on gui
             e.setColor(Graph.highlight);
             publish(e);
@@ -66,6 +63,10 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
             }
             Thread.sleep(SLEEP_TIME);
 
+            // gui paused
+            while(graph.isPaused()) {
+                Thread.sleep(1);
+            }
         }
 
         return true;

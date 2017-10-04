@@ -26,7 +26,7 @@ public class Node extends JPanel implements MouseListener{
         addMouseListener(this);
 
         // set JPanel specs
-        setBounds(x - NODE_SIZE/2, y - NODE_SIZE/2, NODE_SIZE*3, NODE_SIZE); // set center of jpanel on (x,y) on graph
+        setBounds(x - NODE_SIZE/2, y - NODE_SIZE/2, NODE_SIZE*3, NODE_SIZE);
         setOpaque(false);
         setPreferredSize(new Dimension(NODE_SIZE, NODE_SIZE)); // calls paintcomponent
 
@@ -66,6 +66,8 @@ public class Node extends JPanel implements MouseListener{
     }
 
     /**
+     * Called when in add edge state and a node on the gui is clicked
+     *
      * Handles edge forming. Select two existing nodes and an edge will appear between them.
      * Selecting the first node will highlight it. Click the node again to un-select.
      * Selecting the second node will form the edge, and the process is restarted.
@@ -80,9 +82,13 @@ public class Node extends JPanel implements MouseListener{
             parentGraph.setGraphState(2);
             refreshNode();
         } else if (parentGraph.getGraphState() == 2) {
-            // make sure first and second node are different
+            // make sure user clicked on two different nodes
             if (color != Graph.highlight) {
-                parentGraph.addEdge(new Edge(parentGraph.edge_node1, this));
+                Edge existingEdge = parentGraph.findEdge(parentGraph.edge_node1.name, this.name);
+                // make sure new edge is unique
+                if (existingEdge == null) {
+                    parentGraph.addEdge(new Edge(parentGraph.edge_node1, this));
+                }
             }
             parentGraph.setGraphState(1); // restart edge forming process
         }

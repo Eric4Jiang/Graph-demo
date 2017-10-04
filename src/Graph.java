@@ -104,8 +104,9 @@ public class Graph extends JPanel implements MouseListener {
 
     /**
      * Handles node creation.
-     * Omne "Add Node" has been selected, a click on anywhere on the graph
-     * will spawn a node there. Can't place nodes too close to each other.
+     * Once "Add Node" has been selected, a click on anywhere on the graph
+     * will spawn a node Jpanel there, and therefore prevent multiple nodes
+     * from being at the same location.
      *
      * @param e - where mouse was clicked on graph
      */
@@ -162,8 +163,8 @@ public class Graph extends JPanel implements MouseListener {
      * finds all nodes connected to n by an edge
      *
      * @param n - node to find edges for
-     * @return - List of MyPairs. MyPairs will contain edges that are connected to
-     *           Node n.
+     * @return - List of MyPairs. MyPairs will contain edges that are
+     *           connected to Node n.
      */
     public ArrayList<MyPair> adjacent(Node n) {
         ArrayList<MyPair> adj = new ArrayList<>();
@@ -196,11 +197,16 @@ public class Graph extends JPanel implements MouseListener {
             kruskal = new Kruskal(this);
             kruskal.execute();
         } else if (method.equals("prim")) {
-            Prim p = new Prim();
-            return p.solveMST(this);
+            Prim prim = new Prim();
+            return prim.solveMST(this);
         }
 
         return null;
+    }
+
+    public void killAllAnimation() {
+        kruskal.cancel(true);
+        // prim.cancel(true);
     }
 
     public void pauseMSTAnimation(boolean value) {
