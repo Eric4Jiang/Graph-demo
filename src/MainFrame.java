@@ -139,7 +139,7 @@ public class MainFrame extends JFrame {
                 enableComponentsOnPanel(buttonPanel);
                 clearPanel(buttonPanel);
                 createKruskalButton();
-                createPrimButton();
+                // createPrimButton();
                 createBackButton(0);
 
                 graph.setGraphState(-1);
