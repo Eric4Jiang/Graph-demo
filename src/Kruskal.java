@@ -1,7 +1,9 @@
+import javax.lang.model.type.NullType;
 import javax.swing.*;
 import java.util.*;
+import java.util.List;
 
-public class Kruskal extends SwingWorker<Boolean, Edge>{
+public class Kruskal extends SwingWorker<Boolean, NullType>{
 
     Graph graph;
 
@@ -23,8 +25,10 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
     /**
      * Called when this class is executed
      *
-     * finds MST by continuously appending the lowest weight edges onto forests
-     * until there is one distinct forest that contains all the vertices with no cycles
+     * Finds MST via Kruskal's algorithm.
+     * Continuously appends the lowest weight edges onto distinct forests (groups of vertices and edges).
+     * If an edge is connecting two distinct forests, combine the forests.
+     * Repeat until there is one distinct forest that contains all the vertices with no cycles
      *
      * @return - Minimum Spanning tree of graph
      */
@@ -42,7 +46,7 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
         for (Edge e : Edges) {
             // pauses gui to highlight edge on gui
             e.setColor(Graph.highlight);
-            publish(e);
+            publish();
             Thread.sleep(SLEEP_TIME);
 
             String root1 = Find(e.n1.name);
@@ -55,11 +59,13 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
 
                 // highlights edge as part of MST
                 e.setColor(Graph.MST_C);
-                publish(e);
+                e.n1.setColor(Graph.MST_C);
+                e.n2.setColor(Graph.MST_C);
+                publish();
             } else {
                 // edge is not part of MST
                 e.setColor(Graph.defaultC);
-                publish(e);
+                publish();
             }
             Thread.sleep(SLEEP_TIME);
 
@@ -73,13 +79,14 @@ public class Kruskal extends SwingWorker<Boolean, Edge>{
     }
 
     /**
+     * Called every time publish() is called.
      * Can safely update GUI here.
      * Just refreshes the graph. The edge color is set beforehand
      *
      * @param chunks - Edge that is being processed
      */
     @Override
-    protected void process(List<Edge> chunks) {
+    protected void process(List<NullType> chunks) {
         graph.refreshGraph();
     }
 

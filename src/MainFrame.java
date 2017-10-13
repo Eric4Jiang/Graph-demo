@@ -139,7 +139,7 @@ public class MainFrame extends JFrame {
                 enableComponentsOnPanel(buttonPanel);
                 clearPanel(buttonPanel);
                 createKruskalButton();
-                // createPrimButton();
+                createPrimButton();
                 createBackButton(0);
 
                 graph.setGraphState(-1);
@@ -167,7 +167,7 @@ public class MainFrame extends JFrame {
                 createBackButton(1);
             }
         });
-        addToPanelLayer(kruskalButton, 1);;
+        addToPanelLayer(kruskalButton, 1);
     }
 
     /**
@@ -181,12 +181,9 @@ public class MainFrame extends JFrame {
                 clearPanel(buttonPanel);
                 graph.resetComponentColors();
 
+                graph.pauseMSTAnimation(false);
+
                 ArrayList<Edge> MST = graph.animateMST("prim");
-                for (Edge edge : MST) {
-                    edge.setColor(Graph.highlight);
-                }
-                graph.refreshGraph();
-                System.out.println("Prim MST = " + MST);
 
                 createPauseResumeAnimationButton();
                 createBackButton(1);

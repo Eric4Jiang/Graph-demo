@@ -7,8 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Graph extends JPanel implements MouseListener {
-    public static Color defaultC = Color.BLACK, highlight = Color.GREEN,
-                        MST_C = Color.RED ;
+    public static Color defaultC = Color.BLACK,
+                        highlight = Color.GREEN,
+                        MST_C = Color.RED;
 
     public ArrayList<Node> nodes = new ArrayList<>();
     public Map nameToNode = new HashMap<String, Node>();
@@ -30,6 +31,9 @@ public class Graph extends JPanel implements MouseListener {
     public boolean paused = false;
 
     public Graph() {
+        kruskal = new Kruskal(this);
+        prim = new Prim(this);
+
         this.addMouseListener(this);
 
         // init graph
@@ -184,9 +188,10 @@ public class Graph extends JPanel implements MouseListener {
 
     /**
      * Finds the graph's MST(Minimum Spanning Tree)
-     *  or shortest tree that connects all nodes.
+     * or shortest tree that connects all nodes.
      *
      * @param method - which algorithm to find MST
+     *
      * @return - List of edges that represent MST.
      */
     public ArrayList<Edge> animateMST(String method) {
@@ -194,11 +199,11 @@ public class Graph extends JPanel implements MouseListener {
             return null;
 
         if (method.equals("kruskal")) {
-            kruskal = new Kruskal(this);
+            kruskal = new Kruskal(this); // Have to create new worker every time
             kruskal.execute();
         } else if (method.equals("prim")) {
-            Prim prim = new Prim();
-            return prim.solveMST(this);
+            prim = new Prim(this);
+            prim.execute();
         }
 
         return null;
@@ -206,13 +211,10 @@ public class Graph extends JPanel implements MouseListener {
 
     public void killAllAnimation() {
         kruskal.cancel(true);
-        // prim.cancel(true);
+        prim.cancel(true);
     }
 
     public void pauseMSTAnimation(boolean value) {
         this.paused = value;
-//        if (!kruskal.isCancelled()) {
-//            kruskal.cancel(true);
-//        }
     }
 }
