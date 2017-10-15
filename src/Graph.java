@@ -11,29 +11,36 @@ public class Graph extends JPanel implements MouseListener {
                         highlight = Color.GREEN,
                         MST_C = Color.RED;
 
+    // Nodes on the graph
     public ArrayList<Node> nodes = new ArrayList<>();
     public Map nameToNode = new HashMap<String, Node>();
 
+    // Edges on the graph
     public ArrayList<Edge> edges = new ArrayList<>();
     public Map<String, Edge> nameToEdge = new HashMap<>();
     public Node edge_node1;
 
+    // MST animations
+    public SwingWorker kruskal = new Kruskal(this);
+    public SwingWorker prim = new Prim(this);
+    public boolean paused = false;
+
+    // For searching algorithms (BFS and DFS)
+    public Node startNode = null;
+    public Node desiredNode = null;
+
     public int graph_state = -1; // -1 -> Do nothing
-                                 // 0 -> Adding nodes
-                                 // 1 -> Forming edges. 0 nodes selected
-                                 // 2 -> Forming edges. 1 node selected;
-                                 // 3 -> Doing animation demonstration
+                                 //  0 -> Adding nodes
+                                 //  1 -> Forming edges. 0 nodes selected
+                                 //  2 -> Forming edges. 1 node selected
+                                 //  3 -> Choosing animation algorithm
+                                 //  4 -> Choose start node, BFS and DPS
+                                 //  5 -> Choose ending node, BFS and DPS
+                                 //  10 -> ANIMATION TIME
 
     public int GRAPH_SIZE = 1000;
 
-    public SwingWorker kruskal;
-    public SwingWorker prim;
-    public boolean paused = false;
-
     public Graph() {
-        kruskal = new Kruskal(this);
-        prim = new Prim(this);
-
         this.addMouseListener(this);
 
         // init graph
@@ -44,6 +51,7 @@ public class Graph extends JPanel implements MouseListener {
 
     public void setGraphState(int state) {
         System.out.println("state = " + state);
+        // don't reset colors when forming edges
         if (state != 2 && edge_node1 != null) {
             resetComponentColors();
         }
@@ -83,6 +91,9 @@ public class Graph extends JPanel implements MouseListener {
         revalidate();
     }
 
+    /**
+     * Set all components back to default color
+     **/
     public void resetComponentColors() {
         for (Node n : nodes) {
             n.setColor(defaultC);
@@ -108,7 +119,7 @@ public class Graph extends JPanel implements MouseListener {
 
     /**
      * Handles node creation.
-     * Once "Add Node" has been selected, a click on anywhere on the graph
+     * Once "Add Node" has been selected, a click anywhere on the graph
      * will spawn a node Jpanel there, and therefore prevent multiple nodes
      * from being at the same location.
      *
@@ -167,8 +178,8 @@ public class Graph extends JPanel implements MouseListener {
      * finds all nodes connected to n by an edge
      *
      * @param n - node to find edges for
-     * @return - List of MyPairs. MyPairs will contain edges that are
-     *           connected to Node n.
+     * @return - List of MyPair. MyPair contains a node and an edge,
+     *           which will be directly connected to n.
      */
     public ArrayList<MyPair> adjacent(Node n) {
         ArrayList<MyPair> adj = new ArrayList<>();

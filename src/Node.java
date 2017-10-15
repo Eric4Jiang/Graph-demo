@@ -84,13 +84,18 @@ public class Node extends JPanel implements MouseListener{
         } else if (parentGraph.getGraphState() == 2) {
             // make sure user clicked on two different nodes
             if (color != Graph.highlight) {
-                Edge existingEdge = parentGraph.findEdge(parentGraph.edge_node1.name, this.name);
                 // make sure new edge is unique
+                Edge existingEdge = parentGraph.findEdge(parentGraph.edge_node1.name, this.name);
                 if (existingEdge == null) {
                     parentGraph.addEdge(new Edge(parentGraph.edge_node1, this));
                 }
             }
             parentGraph.setGraphState(1); // restart edge forming process
+        } else if (parentGraph.getGraphState() == 4) {
+            parentGraph.startNode = this;
+            parentGraph.setGraphState(4);
+        } else if (parentGraph.getGraphState() == 5) {
+            parentGraph.desiredNode = this;
         }
     }
 
