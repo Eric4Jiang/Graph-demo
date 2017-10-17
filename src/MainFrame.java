@@ -11,7 +11,7 @@ public class MainFrame extends JFrame {
     public ArrayList<JButton> layer1; // creation
     public ArrayList<JButton> layer2; // algorithm
     public ArrayList<JButton> layer3; // animation
-    
+
     public Graph graph;
 
     public MainFrame(String title) {
@@ -28,13 +28,34 @@ public class MainFrame extends JFrame {
         layers.add(layer3);
 
         // add buttons to GUI
-        createAddNodeButton();
-        createAddEdgeButton();
-        createSolveGraphButton();
-        add(this.buttonPanel);
+        JButton nodeB = createAddNodeButton();
+        JButton edgeB = createAddEdgeButton();
+        JButton solveB = createSolveGraphButton();
+        layer1.add(nodeB);
+        layer1.add(edgeB);
+        layer1.add(solveB);
+
+        JButton kruskalB = createKruskalButton();
+        JButton primB = createPrimButton();
+        JButton BFSB = createBFSButton();
+        JButton backToL1B = createBackButton(1);
+        layer2.add(kruskalB);
+        layer2.add(primB);
+        layer2.add(BFSB);
+        layer2.add(backToL1B);
+
+        JButton startB = createStartStopAnimationButton();
+        JButton backToL2B = createBackButton(2);
+        layer3.add(startB);
+        layer3.add(backToL2B);
+
+        graph = new Graph();
+
+        // add buttonPanel to GUI
+        switchToLayer(1);
+        add(buttonPanel);
 
         // add graph to GUI
-        graph = new Graph();
         add(graph);
 
         // init Jframe for GUI
@@ -61,13 +82,10 @@ public class MainFrame extends JFrame {
      * @param h,w : dimensions of button
      * @return button created
      */
-    public JButton makeButton(String name, JPanel panel, int h, int w) {
+    public JButton makeButton(String name, int h, int w) {
         JButton button = new JButton(name);
         button.setFont(new Font("Arial", Font.PLAIN, 40));
         button.setPreferredSize(new Dimension(h, w));
-
-        panel.add(button);
-        refreshPanel(panel);
 
         return button;
     }
@@ -88,45 +106,56 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Associates buttons with a layer
-     * 0 = creation layer, 1 = algorithm layer, 2 = animation layer
+     * Resets graph components
+     * Clears current buttonPanel and creates desired one
      *
-     * @param b - Button we're adding
-     * @param l - Which layer it's on
+     * @param l - which version of the button panel to create (1, 2, or 3)
      */
-    public void addToPanelLayer(JButton b, int l) {
-        ArrayList<JButton> layer = layers.get(l);
-        for (JButton button : layer) {
-            if (button.getText().equals(b.getText()))
-                return;
+    public void switchToLayer(int l) {
+        ArrayList<JButton> layer = layers.get(l - 1);
+
+        graph.resetNodes();
+        graph.resetEdges();
+        graph.refreshGraph();
+
+        clearPanel(buttonPanel);
+        for (JButton b : layer) {
+            // reset start and stop text on button
+            if (b.getText() == "Stop") {
+                b.setText("Start");
+            }
+
+            buttonPanel.add(b);
         }
-        layer.add(b);
+        refreshPanel(buttonPanel);
     }
 
     /**
      * Turns on add node functionality in graph
      */
-    public void createAddNodeButton() {
-        JButton addNodeButton = makeButton("Add Nodes", buttonPanel, BUTTON_H, BUTTON_W);
+    public JButton createAddNodeButton() {
+        JButton addNodeButton = makeButton("Add Nodes", BUTTON_H, BUTTON_W);
         addNodeButton.addActionListener(e -> {
             enableComponentsOnPanel(buttonPanel);
             addNodeButton.setEnabled(false);
             graph.setGraphState(0);
         });
-        addToPanelLayer(addNodeButton, 0);
+
+        return addNodeButton;
     }
 
     /**
      * Turns on edge connecting functionality in graph
      */
-    public void createAddEdgeButton() {
-        JButton addEdgeButton = makeButton("Add Edges", buttonPanel, BUTTON_H, BUTTON_W);
+    public JButton createAddEdgeButton() {
+        JButton addEdgeButton = makeButton("Add Edges", BUTTON_H, BUTTON_W);
         addEdgeButton.addActionListener(e -> {
             enableComponentsOnPanel(buttonPanel);
             addEdgeButton.setEnabled(false);
             graph.setGraphState(1);
         });
-        addToPanelLayer(addEdgeButton, 0);
+
+        return addEdgeButton;
     }
 
     /**
@@ -134,109 +163,98 @@ public class MainFrame extends JFrame {
      * Saves existing graph
      * Create Prim and Kruskal Buttons
      */
-    public void createSolveGraphButton() {
-        JButton addSolveButton = makeButton("Solve Graph", buttonPanel, BUTTON_H, BUTTON_W);
+    public JButton createSolveGraphButton() {
+        JButton addSolveButton = makeButton("Solve Graph", BUTTON_H, BUTTON_W);
         addSolveButton.addActionListener(e -> {
             enableComponentsOnPanel(buttonPanel);
-            clearPanel(buttonPanel);
-
-            // create algorithm layer
-            createKruskalButton();
-            createPrimButton();
-            createBackButton(0);
-
+            switchToLayer(2);
             graph.setGraphState(3);
         });
-        addToPanelLayer(addSolveButton, 0);
+
+        return addSolveButton;
     }
 
     /**
      * Find MST of graph using kruskal's algorithm
      */
-    public void createKruskalButton() {
-        JButton kruskalButton = makeButton("Kruskal", buttonPanel, BUTTON_H, BUTTON_W);
+    public JButton createKruskalButton() {
+        JButton kruskalButton = makeButton("Kruskal", BUTTON_H, BUTTON_W);
         kruskalButton.addActionListener(e -> {
-            clearPanel(buttonPanel);
-            graph.resetComponentColors();
+            switchToLayer(3);
 
             graph.setGraphState(10);
-            graph.pauseMSTAnimation(false);
+            graph.setMethod("kruskal");
+            graph.animateGraphAlgorithm();
 
-            ArrayList<Edge> MST = graph.animateMST("kruskal");
-
-            createPauseResumeAnimationButton();
-            createBackButton(1);
         });
-        addToPanelLayer(kruskalButton, 1);
+
+        return kruskalButton;
     }
 
     /**
      * Finds MST of graph using prim's algorithm
      */
-    public void createPrimButton() {
-        JButton primButton = makeButton("Prim", buttonPanel, BUTTON_H, BUTTON_W);
+    public JButton createPrimButton() {
+        JButton primButton = makeButton("Prim", BUTTON_H, BUTTON_W);
         primButton.addActionListener(e -> {
-            clearPanel(buttonPanel);
-            graph.resetComponentColors();
+            switchToLayer(3);
 
             graph.setGraphState(10);
-            graph.pauseMSTAnimation(false);
-
-            ArrayList<Edge> MST = graph.animateMST("prim");
-
-            createPauseResumeAnimationButton();
-            createBackButton(1);
+            graph.setMethod("prim");
+            graph.animateGraphAlgorithm();
         });
-        addToPanelLayer(primButton, 1);
+
+        return primButton;
     }
 
-    public void createBFSButton() {
-        JButton BFSButton = makeButton("BFS", buttonPanel, BUTTON_H, BUTTON_W);
+    public JButton createBFSButton() {
+        JButton BFSButton = makeButton("BFS", BUTTON_H, BUTTON_W);
         BFSButton.addActionListener(e -> {
-            clearPanel(buttonPanel);
+            switchToLayer(3);
 
-            graph.resetComponentColors();
-
-            createPauseResumeAnimationButton();
-            createBackButton(1);
+            // must click on two nodes for animation to start. 4->5->10
+            // at 10, the BFS animation will start (called from Node.java)
+            graph.setGraphState(4);
+            graph.setMethod("BFS");
         });
 
-        addToPanelLayer(BFSButton, 1);
+        return BFSButton;
     }
 
     /**
      * Takes user back a previous layer
      * @param l - layer to go back to
      */
-    public void createBackButton(int l) {
-        JButton backButton = makeButton("Back", buttonPanel, BUTTON_H, BUTTON_W);
-        ArrayList<JButton> layer = layers.get(l);
+    public JButton createBackButton(int l) {
+        JButton backButton = makeButton("Back", BUTTON_H, BUTTON_W);
         backButton.addActionListener(e -> {
-            clearPanel(buttonPanel);
-
-            graph.killAllAnimation();
-
-            for (JButton b : layer) {
-                buttonPanel.add(b);
+            if (l == 2) { // going from layer 3 to 2
+                graph.killAllAnimation();
+                graph.stopAnimation();
+                graph.setGraphState(3);
+            } else if (l == 1) {
+                graph.setGraphState(-1);
             }
-            // don't create back button for layer
-            if (l != 0) {
-                createBackButton(l - 1);
-            }
+            switchToLayer(l);
         });
+
+        return backButton;
     }
 
-    public void createPauseResumeAnimationButton() {
-        JButton pauseButton = makeButton("Pause", buttonPanel, BUTTON_H, BUTTON_W);
-        pauseButton.addActionListener(e -> {
+    public JButton createStartStopAnimationButton() {
+        JButton startButton = makeButton("Start", BUTTON_H, BUTTON_W);
+        startButton.addActionListener(e -> {
+            if (graph.getGraphState() != 10)
+                return;
             if (graph.isPaused()) {
-                pauseButton.setText("Pause");
-                graph.pauseMSTAnimation(false);
+                startButton.setText("Stop");
+                graph.startAnimation();
             } else {
-                pauseButton.setText("Resume");
-                graph.pauseMSTAnimation(true);
+                startButton.setText("Start");
+                graph.stopAnimation();
             }
         });
-        addToPanelLayer(pauseButton, 2);
+
+        return startButton;
     }
 }

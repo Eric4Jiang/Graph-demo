@@ -13,6 +13,9 @@ public class Node extends JPanel implements MouseListener{
 
     public Ellipse2D.Double circle;
 
+    // for search algorithms (BFS and DFS)
+    public boolean visited = false;
+
     final public int NODE_SIZE = 26;
 
     public Node(int x, int y, Graph parentGraph) {
@@ -20,7 +23,7 @@ public class Node extends JPanel implements MouseListener{
         this.name = Integer.toString(x) + Integer.toString(y);
         this.parentGraph = parentGraph;
         this.circle = new Ellipse2D.Double(0, 0, NODE_SIZE, NODE_SIZE);
-        this.color = Graph.defaultC;
+        this.color = Graph.DEFAULT_C;
 
         // if not included, parentGraph will detect click instead
         addMouseListener(this);
@@ -35,6 +38,14 @@ public class Node extends JPanel implements MouseListener{
 
     public String getName() {
         return this.name;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
+
+    public boolean getVisited() {
+        return this.visited;
     }
 
     public void setColor(Color color) {
@@ -72,31 +83,53 @@ public class Node extends JPanel implements MouseListener{
      * Selecting the first node will highlight it. Click the node again to un-select.
      * Selecting the second node will form the edge, and the process is restarted.
      *
+     * When clicked on it for BFS and DFS, first one clicked is starting node,
+     * and second one clicked is the desire node
+     *
      * @param e - where mouse was clicked on node
      */
     @Override
     public void mouseClicked(MouseEvent e) {
+        // select first node for edge
         if (parentGraph.getGraphState() == 1) {
-            color = Graph.highlight;
+            color = Graph.HIGHLIGHT;
             parentGraph.edge_node1 = this;
             parentGraph.setGraphState(2);
-            refreshNode();
-        } else if (parentGraph.getGraphState() == 2) {
-            // make sure user clicked on two different nodes
-            if (color != Graph.highlight) {
-                // make sure new edge is unique
+        }
+
+        // form edge if two unique nodes are selected
+        else if (parentGraph.getGraphState() == 2) {
+            if (color != Graph.HIGHLIGHT) {
                 Edge existingEdge = parentGraph.findEdge(parentGraph.edge_node1.name, this.name);
                 if (existingEdge == null) {
                     parentGraph.addEdge(new Edge(parentGraph.edge_node1, this));
                 }
             }
+            parentGraph.edge_node1.setColor(Graph.DEFAULT_C);
             parentGraph.setGraphState(1); // restart edge forming process
-        } else if (parentGraph.getGraphState() == 4) {
-            parentGraph.startNode = this;
-            parentGraph.setGraphState(4);
-        } else if (parentGraph.getGraphState() == 5) {
-            parentGraph.desiredNode = this;
         }
+
+        // select starting node for search algorithm
+        else if (parentGraph.getGraphState() == 4) {
+            color = Graph.FINAL_C;
+            parentGraph.startNode = this;
+            parentGraph.setGraphState(5);
+        }
+
+        // select desired node for search algorithm
+        // Must be different from starting node
+        else if (parentGraph.getGraphState() == 5) {
+            if (parentGraph.startNode == this)
+                return;
+
+            color = Graph.FINAL_C;
+            parentGraph.desiredNode = this;
+            parentGraph.setGraphState(10);
+
+            parentGraph.animateGraphAlgorithm();
+        }
+
+        refreshNode(); // update and color changes
     }
 
     @Override

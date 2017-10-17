@@ -5,7 +5,7 @@ import java.util.*;
 public class Prim extends SwingWorker<Boolean, NullType>{
 
     public Graph graph;
-    public final int SLEEP_TIME = 500;
+    public final int SLEEP_TIME = 1000;
 
     public Map<String, String> PARENT;
     public Map<String, Double> KEY;
@@ -43,24 +43,23 @@ public class Prim extends SwingWorker<Boolean, NullType>{
 
         // until all vertices are connected
         while(Q.size() != 0) {
+            // gui paused
+            while(graph.isPaused()) {
+                Thread.sleep(1);
+            }
+
             int nPos = posMinWeightV(Q);
             Node u = Q.get(nPos); // choose closest vertex to tree
             Q.remove(nPos);
 
-            // clear node highlights
-            for (Node n : Q) {
-                n.setColor(Graph.defaultC);
-            }
-            u.setColor(Graph.MST_C);
-            publish();
-            Thread.sleep(SLEEP_TIME);
+            u.setColor(Graph.CURRENT_C);
 
             // connect node to parent to form edge
             if(PARENT.get(u.name) != null) {
                 Edge e = graph.findEdge(u.name, PARENT.get(u.name));
                 MST.add(e);
 
-                e.setColor(Graph.MST_C);
+                e.setColor(Graph.FINAL_C);
                 publish();
                 Thread.sleep(SLEEP_TIME);
             }
@@ -79,16 +78,13 @@ public class Prim extends SwingWorker<Boolean, NullType>{
                         PARENT.put(adjV.name, u.name);
                         KEY.put(adjV.name, adjE.weight);
                     }
-                    adjV.setColor(Graph.highlight);
+                    adjV.setColor(Graph.HIGHLIGHT);
                 }
             }
             publish();
             Thread.sleep(SLEEP_TIME);
 
-            // gui paused
-            while(graph.isPaused()) {
-                Thread.sleep(1);
-            }
+            u.setColor(Graph.FINAL_C);
         }
 
         return true;
@@ -115,7 +111,6 @@ public class Prim extends SwingWorker<Boolean, NullType>{
      * Iterates through list for node with lowest weight.
      *
      * @param N - List to traverse through
-     *
      * @return - index of node with lowest weight
      */
     public int posMinWeightV(ArrayList<Node> N) {

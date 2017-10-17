@@ -7,9 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Graph extends JPanel implements MouseListener {
-    public static Color defaultC = Color.BLACK,
-                        highlight = Color.GREEN,
-                        MST_C = Color.RED;
+    public static Color DEFAULT_C = Color.BLACK,
+                        HIGHLIGHT = Color.GREEN,
+                        FINAL_C = Color.RED,
+                        CURRENT_C = Color.BLUE;
 
     // Nodes on the graph
     public ArrayList<Node> nodes = new ArrayList<>();
@@ -21,11 +22,13 @@ public class Graph extends JPanel implements MouseListener {
     public Node edge_node1;
 
     // MST animations
+    public String method = "kruskal";
     public SwingWorker kruskal = new Kruskal(this);
     public SwingWorker prim = new Prim(this);
-    public boolean paused = false;
+    public boolean paused = true;
 
     // For searching algorithms (BFS and DFS)
+    public SwingWorker BFS = new BreadthFirstSearch(this);
     public Node startNode = null;
     public Node desiredNode = null;
 
@@ -52,9 +55,10 @@ public class Graph extends JPanel implements MouseListener {
     public void setGraphState(int state) {
         System.out.println("state = " + state);
         // don't reset colors when forming edges
-        if (state != 2 && edge_node1 != null) {
-            resetComponentColors();
-        }
+//        if (state != 2 && state != 5) { // edge_node1 != null) {
+//            resetNodes();
+//            resetEdges();
+//        }
         this.graph_state = state;
     }
 
@@ -94,12 +98,17 @@ public class Graph extends JPanel implements MouseListener {
     /**
      * Set all components back to default color
      **/
-    public void resetComponentColors() {
+    public void resetNodes() {
         for (Node n : nodes) {
-            n.setColor(defaultC);
+            n.setColor(DEFAULT_C);
+            n.setVisited(false);
         }
+        refreshGraph();
+    }
+
+    public void resetEdges() {
         for (Edge e : edges) {
-            e.setColor(defaultC);
+            e.setColor(DEFAULT_C);
         }
         refreshGraph();
     }
@@ -127,7 +136,6 @@ public class Graph extends JPanel implements MouseListener {
      */
     @Override
     public void mouseClicked(MouseEvent e) {
-//        System.out.println("graph-clicked");
         if (graph_state == 0) {
             // create a node where mouse was clicked
             Node n = new Node(e.getX(), e.getY(), this);
@@ -197,35 +205,45 @@ public class Graph extends JPanel implements MouseListener {
         return adj;
     }
 
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
     /**
-     * Finds the graph's MST(Minimum Spanning Tree)
-     * or shortest tree that connects all nodes.
-     *
-     * @param method - which algorithm to find MST
+     * Starts an animation determined by <method>
+     * <method> - the algorithm chosen by the user
      *
      * @return - List of edges that represent MST.
      */
-    public ArrayList<Edge> animateMST(String method) {
+    public void animateGraphAlgorithm() {
         if (edges.isEmpty())
-            return null;
+            return;
 
-        if (method.equals("kruskal")) {
-            kruskal = new Kruskal(this); // Have to create new worker every time
+        // Have to create new worker for every new animation
+        if (this.method.equals("kruskal")) {
+            kruskal = new Kruskal(this);
             kruskal.execute();
-        } else if (method.equals("prim")) {
+        } else if (this.method.equals("prim")) {
             prim = new Prim(this);
             prim.execute();
+        } else if (this.method.equals("BFS")) {
+            BFS = new BreadthFirstSearch(this);
+            BFS.execute();
         }
-
-        return null;
     }
 
     public void killAllAnimation() {
         kruskal.cancel(true);
         prim.cancel(true);
+        BFS.cancel(true);
     }
 
-    public void pauseMSTAnimation(boolean value) {
-        this.paused = value;
+    public void startAnimation() {
+        this.paused = false;
     }
+
+    public void stopAnimation() {
+        this.paused = true;
+    }
+
 }

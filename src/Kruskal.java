@@ -7,7 +7,7 @@ public class Kruskal extends SwingWorker<Boolean, NullType>{
 
     Graph graph;
 
-    public final int SLEEP_TIME = 500;
+    public final int SLEEP_TIME = 1000;
 
     public Map<String, String> PARENT;
     public Map<String, Integer> RANK;
@@ -44,8 +44,13 @@ public class Kruskal extends SwingWorker<Boolean, NullType>{
             RANK.put(n.name, 0);
         }
         for (Edge e : Edges) {
-            // pauses gui to highlight edge on gui
-            e.setColor(Graph.highlight);
+            // gui paused
+            while(graph.isPaused()) {
+                Thread.sleep(1);
+            }
+
+            // pauses gui to highlight current edge
+            e.setColor(Graph.HIGHLIGHT);
             publish();
             Thread.sleep(SLEEP_TIME);
 
@@ -58,21 +63,16 @@ public class Kruskal extends SwingWorker<Boolean, NullType>{
                 Union(root1, root2);
 
                 // highlights edge as part of MST
-                e.setColor(Graph.MST_C);
-                e.n1.setColor(Graph.MST_C);
-                e.n2.setColor(Graph.MST_C);
+                e.setColor(Graph.FINAL_C);
+                e.n1.setColor(Graph.FINAL_C);
+                e.n2.setColor(Graph.FINAL_C);
                 publish();
             } else {
                 // edge is not part of MST
-                e.setColor(Graph.defaultC);
+                e.setColor(Graph.DEFAULT_C);
                 publish();
             }
             Thread.sleep(SLEEP_TIME);
-
-            // gui paused
-            while(graph.isPaused()) {
-                Thread.sleep(1);
-            }
         }
 
         return true;

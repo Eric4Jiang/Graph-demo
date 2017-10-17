@@ -12,7 +12,7 @@ public class Edge implements Comparable<Edge> {
         this.n2 = n2;
         this.weight = lengthSquared();
         this.name = n1.name + n2.name;
-        color = Graph.defaultC;
+        color = Graph.DEFAULT_C;
 
         System.out.println("Edge name = " + n1.name + " " + n2.name);
     }
