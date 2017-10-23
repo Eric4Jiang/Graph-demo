@@ -7,7 +7,7 @@ public class Prim extends SwingWorker<Boolean, NullType>{
     public Graph graph;
     public final int SLEEP_TIME = 1000;
 
-    public Map<String, String> PARENT;
+    public Map<Node, Node> PARENT;
     public Map<String, Double> KEY;
 
     public ArrayList<Edge> MST;
@@ -29,17 +29,17 @@ public class Prim extends SwingWorker<Boolean, NullType>{
     protected Boolean doInBackground() throws Exception {
         ArrayList<Node> Nodes = graph.nodes;
 
+        // Q holds the vertices that are not connected at any given time
+        ArrayList<Node> Q = new ArrayList<>();
+        Q.addAll(Nodes);
+
         // set all points to default value (MAX)
-        for(Node n : Nodes) {
-            PARENT.put(n.name, null);
+        for(Node n : Q) {
+            PARENT.put(n, null);
             KEY.put(n.name, Double.MAX_VALUE);
         }
         // set a starting point (value = 0)
         KEY.put(Nodes.get(0).name, 0.0);
-
-        // Q holds the vertices that are not connected at any given time
-        ArrayList<Node> Q = new ArrayList<>();
-        Q.addAll(Nodes);
 
         // until all vertices are connected
         while(Q.size() != 0) {
@@ -55,8 +55,8 @@ public class Prim extends SwingWorker<Boolean, NullType>{
             u.setColor(Graph.CURRENT_C);
 
             // connect node to parent to form edge
-            if(PARENT.get(u.name) != null) {
-                Edge e = graph.findEdge(u.name, PARENT.get(u.name));
+            if(PARENT.get(u) != null) {
+                Edge e = graph.findEdge(u, PARENT.get(u));
                 MST.add(e);
 
                 e.setColor(Graph.FINAL_C);
@@ -75,7 +75,7 @@ public class Prim extends SwingWorker<Boolean, NullType>{
                 //      2) If adjV is closer to another vertex (not u)
                 if(Q.contains(adjV)) {
                     if(adjE.weight < KEY.get(adjV.name)) {
-                        PARENT.put(adjV.name, u.name);
+                        PARENT.put(adjV, u);
                         KEY.put(adjV.name, adjE.weight);
                     }
                     adjV.setColor(Graph.HIGHLIGHT);

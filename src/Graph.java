@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Graph extends JPanel implements MouseListener {
+    // Colors for animations
     public static Color DEFAULT_C = Color.BLACK,
                         HIGHLIGHT = Color.GREEN,
                         FINAL_C = Color.RED,
@@ -21,17 +22,19 @@ public class Graph extends JPanel implements MouseListener {
     public Map<String, Edge> nameToEdge = new HashMap<>();
     public Node edge_node1;
 
-    // MST animations
+    // MST animations variables (kruskal + prim)
     public String method = "kruskal";
     public SwingWorker kruskal = new Kruskal(this);
     public SwingWorker prim = new Prim(this);
     public boolean paused = true;
 
-    // For searching algorithms (BFS and DFS)
+    // Searching animation variables (BFS + DFS)
     public SwingWorker BFS = new BreadthFirstSearch(this);
+    public SwingWorker DFS = new DepthFirstSearch(this);
     public Node startNode = null;
     public Node desiredNode = null;
 
+    // Used to easily determine what stage of our animation we're on.
     public int graph_state = -1; // -1 -> Do nothing
                                  //  0 -> Adding nodes
                                  //  1 -> Forming edges. 0 nodes selected
@@ -41,7 +44,7 @@ public class Graph extends JPanel implements MouseListener {
                                  //  5 -> Choose ending node, BFS and DPS
                                  //  10 -> ANIMATION TIME
 
-    public int GRAPH_SIZE = 1000;
+    public final int GRAPH_SIZE = 1000;
 
     public Graph() {
         this.addMouseListener(this);
@@ -95,9 +98,7 @@ public class Graph extends JPanel implements MouseListener {
         revalidate();
     }
 
-    /**
-     * Set all components back to default color
-     **/
+    // Set all nodes to default colors and not visited
     public void resetNodes() {
         for (Node n : nodes) {
             n.setColor(DEFAULT_C);
@@ -106,6 +107,7 @@ public class Graph extends JPanel implements MouseListener {
         refreshGraph();
     }
 
+    // Set all Edges to default color
     public void resetEdges() {
         for (Edge e : edges) {
             e.setColor(DEFAULT_C);
@@ -171,9 +173,11 @@ public class Graph extends JPanel implements MouseListener {
      * @return - Instance of edge that connects the first and second node.
      *           If no edge found, return null.
      */
-    public Edge findEdge(String n1, String n2) {
-        String name1 = n1 + n2;
-        String name2 = n2 + n1;
+    public Edge findEdge(Node n1, Node n2) {
+        String s1 = n1.getName();
+        String s2 = n2.getName();
+        String name1 = s1 + s2;
+        String name2 = s2 + s1;
 
         if (!nameToEdge.containsKey(name1)) {
             return nameToEdge.get(name2);
@@ -229,6 +233,9 @@ public class Graph extends JPanel implements MouseListener {
         } else if (this.method.equals("BFS")) {
             BFS = new BreadthFirstSearch(this);
             BFS.execute();
+        } else if (this.method.equals("DFS")) {
+            DFS = new DepthFirstSearch(this);
+            DFS.execute();
         }
     }
 
@@ -236,6 +243,7 @@ public class Graph extends JPanel implements MouseListener {
         kruskal.cancel(true);
         prim.cancel(true);
         BFS.cancel(true);
+        DFS.cancel(true);
     }
 
     public void startAnimation() {

@@ -19,6 +19,10 @@ public class BreadthFirstSearch extends SwingWorker <Boolean, NullType>{
     // performs BFS animation
     @Override
     protected Boolean doInBackground() throws Exception {
+        for (Node n : graph.nodes) {
+            n.setVisited(false);
+        }
+
         Q.add(graph.startNode);
         graph.startNode.setVisited(true);
 
@@ -28,13 +32,14 @@ public class BreadthFirstSearch extends SwingWorker <Boolean, NullType>{
                 Thread.sleep(1);
             }
 
-            Node currentNode = Q.poll(); // deque
-            currentNode.setColor(Graph.CURRENT_C);
+            Node u = Q.poll(); // deque
+            u.setColor(Graph.CURRENT_C);
             publish();
             Thread.sleep(SLEEP_TIME);
 
             // find all un-visited adjacent nodes and add them to queue
-            ArrayList<MyPair> adj = graph.adjacent(currentNode);
+            ArrayList<MyPair> adj = graph.adjacent(u);
+            boolean adjNodeFound = false;
             for (MyPair pair : adj) {
                 Node adjN = pair.node;
                 Edge adjE = pair.edge;
@@ -42,7 +47,7 @@ public class BreadthFirstSearch extends SwingWorker <Boolean, NullType>{
                 if (!adjN.visited) {
                     // FOUND DESIRED NODE
                     if (adjN == graph.desiredNode) {
-                        currentNode.setColor(Graph.FINAL_C);
+                        u.setColor(Graph.FINAL_C);
                         adjN.setColor(Graph.CURRENT_C);
                         adjE.setColor(Graph.FINAL_C);
                         publish();
@@ -53,12 +58,15 @@ public class BreadthFirstSearch extends SwingWorker <Boolean, NullType>{
                     Q.add(adjN);
                     adjN.setColor(Graph.HIGHLIGHT);
                     adjE.setColor(Graph.FINAL_C);
+                    adjNodeFound = true;
                 }
             }
-            publish();
-            Thread.sleep(SLEEP_TIME);
+            if (adjNodeFound) {
+                publish();
+                Thread.sleep(SLEEP_TIME);
+            }
 
-            currentNode.setColor(Graph.FINAL_C);
+            u.setColor(Graph.FINAL_C);
         }
         return true;
     }

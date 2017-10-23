@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class MainFrame extends JFrame {
 
     public JPanel buttonPanel;
-    final public int BUTTON_H = 300, BUTTON_W = 50;
+    final public int BUTTON_H = 250, BUTTON_W = 50;
 
     public ArrayList<ArrayList<JButton>> layers;
     public ArrayList<JButton> layer1; // creation
@@ -18,7 +18,9 @@ public class MainFrame extends JFrame {
         super(title);
 
         buttonPanel = new JPanel();
+        graph = new Graph();
 
+        // init layers for buttonpanel
         layers = new ArrayList<>();
         layer1 = new ArrayList<>();
         layer2 = new ArrayList<>();
@@ -27,7 +29,7 @@ public class MainFrame extends JFrame {
         layers.add(layer2);
         layers.add(layer3);
 
-        // add buttons to GUI
+        // init buttons
         JButton nodeB = createAddNodeButton();
         JButton edgeB = createAddEdgeButton();
         JButton solveB = createSolveGraphButton();
@@ -37,11 +39,13 @@ public class MainFrame extends JFrame {
 
         JButton kruskalB = createKruskalButton();
         JButton primB = createPrimButton();
-        JButton BFSB = createBFSButton();
+        JButton bfsB = createBFSButton();
+        JButton dfsB = createDFSButton();
         JButton backToL1B = createBackButton(1);
         layer2.add(kruskalB);
         layer2.add(primB);
-        layer2.add(BFSB);
+        layer2.add(bfsB);
+        layer2.add(dfsB);
         layer2.add(backToL1B);
 
         JButton startB = createStartStopAnimationButton();
@@ -49,13 +53,18 @@ public class MainFrame extends JFrame {
         layer3.add(startB);
         layer3.add(backToL2B);
 
-        graph = new Graph();
-
-        // add buttonPanel to GUI
+        // start program at creation layer
         switchToLayer(1);
-        add(buttonPanel);
 
-        // add graph to GUI
+        // add legend to graph
+        JLabel label = new JLabel();
+        ImageIcon icon = new ImageIcon("./legend.png");
+        label.setIcon(icon);
+        label.setBounds(graph.GRAPH_SIZE - 125, -20, 150, 150); // label default size is 0
+        graph.add(label);
+
+        // add components onto JFrame
+        add(buttonPanel);
         add(graph);
 
         // init Jframe for GUI
@@ -86,7 +95,6 @@ public class MainFrame extends JFrame {
         JButton button = new JButton(name);
         button.setFont(new Font("Arial", Font.PLAIN, 40));
         button.setPreferredSize(new Dimension(h, w));
-
         return button;
     }
 
@@ -106,28 +114,26 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Resets graph components
      * Clears current buttonPanel and creates desired one
+     * Resets graph components
      *
      * @param l - which version of the button panel to create (1, 2, or 3)
      */
     public void switchToLayer(int l) {
         ArrayList<JButton> layer = layers.get(l - 1);
-
-        graph.resetNodes();
-        graph.resetEdges();
-        graph.refreshGraph();
-
         clearPanel(buttonPanel);
         for (JButton b : layer) {
             // reset start and stop text on button
             if (b.getText() == "Stop") {
                 b.setText("Start");
             }
-
             buttonPanel.add(b);
         }
         refreshPanel(buttonPanel);
+
+        graph.resetNodes();
+        graph.resetEdges();
+        graph.refreshGraph();
     }
 
     /**
@@ -140,7 +146,6 @@ public class MainFrame extends JFrame {
             addNodeButton.setEnabled(false);
             graph.setGraphState(0);
         });
-
         return addNodeButton;
     }
 
@@ -154,7 +159,6 @@ public class MainFrame extends JFrame {
             addEdgeButton.setEnabled(false);
             graph.setGraphState(1);
         });
-
         return addEdgeButton;
     }
 
@@ -170,7 +174,6 @@ public class MainFrame extends JFrame {
             switchToLayer(2);
             graph.setGraphState(3);
         });
-
         return addSolveButton;
     }
 
@@ -187,7 +190,6 @@ public class MainFrame extends JFrame {
             graph.animateGraphAlgorithm();
 
         });
-
         return kruskalButton;
     }
 
@@ -203,7 +205,6 @@ public class MainFrame extends JFrame {
             graph.setMethod("prim");
             graph.animateGraphAlgorithm();
         });
-
         return primButton;
     }
 
@@ -217,8 +218,18 @@ public class MainFrame extends JFrame {
             graph.setGraphState(4);
             graph.setMethod("BFS");
         });
-
         return BFSButton;
+    }
+
+    public JButton createDFSButton() {
+        JButton DFSButton = makeButton("DPS", BUTTON_H, BUTTON_W);
+        DFSButton.addActionListener(e -> {
+            switchToLayer(3);
+
+            graph.setGraphState(4);
+            graph.setMethod("DFS");
+        });
+        return DFSButton;
     }
 
     /**
@@ -237,7 +248,6 @@ public class MainFrame extends JFrame {
             }
             switchToLayer(l);
         });
-
         return backButton;
     }
 
@@ -254,7 +264,6 @@ public class MainFrame extends JFrame {
                 graph.stopAnimation();
             }
         });
-
         return startButton;
     }
 }

@@ -29,8 +29,8 @@ public class Node extends JPanel implements MouseListener{
         addMouseListener(this);
 
         // set JPanel specs
-        setBounds(x - NODE_SIZE/2, y - NODE_SIZE/2, NODE_SIZE*3, NODE_SIZE);
         setOpaque(false);
+        setBounds(x - NODE_SIZE/2, y - NODE_SIZE/2, NODE_SIZE*3, NODE_SIZE);
         setPreferredSize(new Dimension(NODE_SIZE, NODE_SIZE)); // calls paintcomponent
 
         System.out.println("Node = " + name);
@@ -72,7 +72,7 @@ public class Node extends JPanel implements MouseListener{
         g.setColor(color);
 
         // draw node and name it
-        g.drawString(name, NODE_SIZE, NODE_SIZE / 2);
+        g.drawString(name, NODE_SIZE, NODE_SIZE);
         g2d.fill(circle);
     }
 
@@ -100,7 +100,7 @@ public class Node extends JPanel implements MouseListener{
         // form edge if two unique nodes are selected
         else if (parentGraph.getGraphState() == 2) {
             if (color != Graph.HIGHLIGHT) {
-                Edge existingEdge = parentGraph.findEdge(parentGraph.edge_node1.name, this.name);
+                Edge existingEdge = parentGraph.findEdge(parentGraph.edge_node1, this);
                 if (existingEdge == null) {
                     parentGraph.addEdge(new Edge(parentGraph.edge_node1, this));
                 }
@@ -119,16 +119,17 @@ public class Node extends JPanel implements MouseListener{
         // select desired node for search algorithm
         // Must be different from starting node
         else if (parentGraph.getGraphState() == 5) {
-            if (parentGraph.startNode == this)
-                return;
-
-            color = Graph.FINAL_C;
-            parentGraph.desiredNode = this;
-            parentGraph.setGraphState(10);
-
-            parentGraph.animateGraphAlgorithm();
+            if (parentGraph.startNode == this) {
+                parentGraph.startNode.setColor(Graph.DEFAULT_C);
+                parentGraph.startNode = null;
+                parentGraph.setGraphState(4);
+            } else {
+                color = Graph.FINAL_C;
+                parentGraph.desiredNode = this;
+                parentGraph.setGraphState(10);
+                parentGraph.animateGraphAlgorithm();
+            }
         }
-
         refreshNode(); // update and color changes
     }
 
