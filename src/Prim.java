@@ -5,7 +5,7 @@ import java.util.*;
 public class Prim extends SwingWorker<Boolean, NullType>{
 
     public Graph graph;
-    public final int SLEEP_TIME = 1000;
+    public int SLEEP_TIME = 1000;
 
     public Map<Node, Node> PARENT;
     public Map<String, Double> KEY;
@@ -18,6 +18,10 @@ public class Prim extends SwingWorker<Boolean, NullType>{
         PARENT = new HashMap<>();
         KEY = new HashMap<>();
         MST = new ArrayList<>();
+
+        if (this.graph.nodes.size() > 10) {
+            this.SLEEP_TIME /= 2;
+        }
     }
 
     /**

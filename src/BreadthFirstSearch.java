@@ -9,11 +9,15 @@ public class BreadthFirstSearch extends SwingWorker <Boolean, NullType>{
     public Graph graph;
     public Queue<Node> Q;
 
-    public final int SLEEP_TIME = 1000;
+    public int SLEEP_TIME = 1000;
 
     public BreadthFirstSearch(Graph graph) {
         this.graph = graph;
         this.Q = new LinkedList<>();
+
+        if (this.graph.nodes.size() > 10) {
+            this.SLEEP_TIME /= 2;
+        }
     }
 
     // performs BFS animation

@@ -7,7 +7,7 @@ public class Kruskal extends SwingWorker<Boolean, NullType>{
 
     Graph graph;
 
-    public final int SLEEP_TIME = 1000;
+    public int SLEEP_TIME = 1000;
 
     public Map<String, String> PARENT;
     public Map<String, Integer> RANK;
@@ -20,6 +20,10 @@ public class Kruskal extends SwingWorker<Boolean, NullType>{
         PARENT = new HashMap<>();
         RANK = new HashMap<>();
         MST = new ArrayList<>();
+
+        if (this.graph.nodes.size() > 10) {
+            this.SLEEP_TIME /= 2;
+        }
     }
 
     /**

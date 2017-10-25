@@ -7,11 +7,15 @@ public class DepthFirstSearch extends SwingWorker<Boolean, NullType> {
     public Graph graph;
     public Stack<Node> S;
 
-    public final int SLEEP_TIME = 1000;
+    public int SLEEP_TIME = 1000;
 
     public DepthFirstSearch(Graph graph) {
         this.graph = graph;
         this.S = new Stack<>();
+
+        if (this.graph.nodes.size() > 10) {
+            this.SLEEP_TIME /= 2;
+        }
     }
 
     // performs DFS animation
