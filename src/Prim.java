@@ -5,7 +5,7 @@ import java.util.*;
 public class Prim extends SwingWorker<Boolean, NullType>{
 
     public Graph graph;
-    public int SLEEP_TIME = 1000;
+    public int SLEEP_TIME = 1500;
 
     public Map<Node, Node> PARENT;
     public Map<String, Double> KEY;
